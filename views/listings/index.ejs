@@ -1,0 +1,200 @@
+<% layout("/layouts/boilerplate") %>
+
+    <style>
+        #filters {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1.25rem;
+            padding-top: 0.5rem;
+            align-items: center;
+        }
+
+        .filter {
+            text-align: center;
+            margin-right: 1rem;
+            margin-top: 2rem;
+            opacity: 0.7;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            flex: 0 0 auto;
+        }
+
+        .filter:hover {
+            opacity: 1;
+            cursor: pointer;
+            transform: translateY(-1px);
+        }
+
+        .filter i {
+            font-size: 1rem;
+        }
+
+        .filter p {
+            font-size: 0.7rem;
+            margin-top: 0.15rem;
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+
+        .tax-toggle {
+            border: 1px solid #d1d1d1;
+            border-radius: 0.8rem;
+            height: 3.25rem;
+            padding: 0.4rem 0.8rem;
+            margin-left: 2rem;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .tax-toggle {
+                margin-left: 0;
+                width: 100%;
+                justify-content: center;
+                margin-top: 0.5rem;
+            }
+        }
+
+        .tax-info {
+            display: none;
+        }
+
+        .tax-toggle {
+            border: 1px solid black;
+            border-radius: 1rem;
+            height: 3.5rem;
+            padding: 1rem;
+        }
+    </style>
+
+    <div class="d-flex justify-content-end mt-2">
+        <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse"
+            data-bs-target="#filterCollapse" aria-expanded="true" aria-controls="filterCollapse">
+            <i class="fa-solid fa-sliders me-1"></i> Filters
+        </button>
+    </div>
+
+    <div class="collapse show" id="filters">
+        <% categories.forEach(cat=> { %>
+            <div class="filter <%= activeCategory === cat.key ? 'active' : '' %>" data-category="<%= cat.key %>">
+                <div><i class="<%= cat.icon %>"></i></div>
+                <p>
+                    <%= cat.label %>
+                </p>
+            </div>
+            <% }); %>
+                <!-- <div class="filter">
+                    <div><i class="fa-solid fa-fire"></i></div>
+                    <p>Trending</p>
+                </div>
+                <div class="filter">
+                    <div><i class="fa-solid fa-bed"></i></div>
+                    <p>Rooms</p>
+                </div>
+                <div class="filter">
+                    <div><i class="fa-solid fa-mountain-city"></i></div>
+                    <p>Iconic Cities</p>
+                </div>
+                <div class="filter">
+                    <div><i class="fa-solid fa-mountain"></i></div>
+                    <p>Mountains</p>
+                </div>
+                <div class="filter">
+                    <div><i class="fa-brands fa-fort-awesome"></i></div>
+                    <p>Castles</p>
+                </div>
+                <div class="filter">
+                    <div><i class="fa-solid fa-person-swimming"></i></div>
+                    <p>Amazing Pools</p>
+                </div>
+                <div class="filter">
+                    <div><i class="fa-solid fa-campground"></i></div>
+                    <p>Camping</p>
+                </div>
+                <div class="filter">
+                    <div><i class="fa-solid fa-cow"></i></div>
+                    <p>Cow</p>
+                </div>
+                <div class="filter">
+                    <div><i class="fa-regular fa-snowflake"></i></div>
+                    <p>Arctic</p>
+                </div> -->
+                <div class="tax-toggle">
+                    <div class="form-check-reverse form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
+                        <label class="form-check-label" for="switchCheckDefault">Display total after taxes</label>
+                    </div>
+                </div>
+    </div>
+
+    <% if(allListings.length===0) { %>
+        <div class="col-6 offset-3 text-center mt-5">
+            <h3>No listings found</h3>
+            <% if (searchQuery || activeCategory) { %>
+                <p class="text-muted">Try resetting your filters or search terms.</p>
+                <% } %>
+                    <a href="/listings" class="btn btn-dark mt-2">Clear Filters</a>
+        </div>
+        <% } else { %>
+            <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-4 mt-3">
+                <% for (let listing of allListings) { %>
+                    <div class="col">
+                        <a href="/listings/<%= listing._id %>" class="listing-link">
+                            <div class="card listing-card">
+                                <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image"
+                                    style="height: 20rem; object-fit: cover;" />
+
+                                <div class="card-img-overlay">
+                                </div>
+
+                                <div class="card-body">
+                                    <!-- <h5 class="card-title">Card title</h5> -->
+                                    <p class="card-text">
+                                        <b>
+                                            <%= listing.title %> <br />
+                                        </b>
+                                        &#8377; <%= listing.price.toLocaleString("en-IN") %> / Night
+                                            <i class="tax-info"> &nbsp; &nbsp; +18% GST</i>
+                                    </p>
+                                    <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <% } %>
+            </div>
+            <% } %>
+
+                <script>
+                    let taxSwitch = document.getElementById("switchCheckDefault");
+                    taxSwitch.addEventListener("click", () => {
+                        let taxInfo = document.getElementsByClassName('tax-info');
+                        for (info of taxInfo) {
+                            info.style.display = (info.style.display !== 'inline') ? 'inline' : 'none';
+                        }
+                    })
+
+                    const activeCategory = "<%= activeCategory || '' %>";
+                    const searchQuery = "<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>";
+                    
+                    document.querySelectorAll(".filter").forEach((filterEl) => {
+                        filterEl.addEventListener("click", () => {
+                            const category = filterEl.dataset.category;
+                            const urlParams = new URLSearchParams(window.location.search);
+
+                            // Clicking the already-active filter clears it, otherwise apply it.
+                            if (category === activeCategory) {
+                                urlParams.delete('category')
+                            } else {
+                                urlParams.set('category', category)
+                            }
+
+                            if (searchQuery) {
+                                urlParams.set('q', searchQuery);
+                            }
+                            const queryString = urlParams.toString();
+                            window.location.href = `/listings${queryString ? '?' + queryString : ''}`;
+                        });
+                    });
+                </script>
